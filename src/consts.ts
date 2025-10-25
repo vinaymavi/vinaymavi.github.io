@@ -3,3 +3,5 @@
 
 export const SITE_TITLE = "VinayMavi";
 export const SITE_DESCRIPTION = "Welcome to Vinay Mavi Blogs";
+export const GITHUB_PROFILE = "https://github.com/vinaymavi";
+export const MY_NAME = "Vinay Mavi";
