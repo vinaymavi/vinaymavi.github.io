@@ -3,6 +3,9 @@ A modern, 3D illustration of "[subject]" The style should feature a 'light mode'
 
 
 
-# Latest 
+<!-- # Latest work best chatgpt prompt -->
 A modern, 3D illustration of "A Mac laptop on top of the table, other object like cup, headphone, iphone also spreaded on the table. Mac book screen is filled with 3D code window" The style should feature a 'light mode' aesthetic with predominantly bright, airy spaces, and a smooth, rounded, almost playful aesthetic for all elements. The illustration should be rendered with a high-contrast, cool-toned color palette. Dominant shades include very light purple and white, deep blue and dark outlines. Subtle accents should incorporate various shades of blue, from a vibrant electric blue to a more muted, silvery-blue, used sparingly for a subtle brand accent or highlight. The overall mood should be clean, modern, and sophisticated. Image ratio 16:9. 
+
+<!-- Latest -->
+A modern, 3D illustration of "A Mac laptop on top of the table, other object like cup, headphone, iphone also spreaded on the table. Mac book screen is filled with 3D code window" The style should feature a 'light mode' aesthetic with predominantly bright, airy spaces, and a smooth, rounded, almost playful aesthetic for all elements. The illustration should be rendered with a high-contrast, cool-toned color palette. Dominant shades include very light purple and white, light blue and dark outlines. Subtle accents should incorporate various shades of blue, from a vibrant electric blue to a more muted, silvery-blue, used sparingly for a subtle brand accent or highlight. The overall mood should be clean, modern, and sophisticated. Image ratio 16:9. 
 
