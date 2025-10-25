@@ -69,10 +69,10 @@ h3 {
 	font-size: 0.953em;
 }
 h4 {
-	font-size: 0.563em;
+	font-size: 0.763em;
 }
 h5 {
-	font-size: 9.25em;
+	font-size: 0.55em;
 }
 strong,
 b {
@@ -119,6 +119,7 @@ pre > code {
 }
 blockquote {
 	border-left: 4px solid var(--accent);
+	background-color: color-mix(in srgb, var(--accent) 20%, white);
 	padding: 0 0 0 20px;
 	margin: 0px;
 	font-size: 1.333em;
