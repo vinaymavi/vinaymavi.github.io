@@ -6,13 +6,17 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "tags:generate": "node ./integrations/script.js",
+    "tags:preview": "node ./integrations/script.js --dry-run"
   },
   "dependencies": {
     "@astrojs/mdx": "^4.3.8",
     "@astrojs/rss": "^4.0.12",
     "@astrojs/sitemap": "^3.6.0",
     "astro": "^5.15.0",
+    "dotenv": "^17.2.3",
+    "openai": "^6.7.0",
     "sharp": "^0.34.3"
   }
 }
