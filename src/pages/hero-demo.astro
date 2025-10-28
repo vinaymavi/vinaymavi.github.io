@@ -1,0 +1,44 @@
+---
+import BaseHead from "../components/BaseHead.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import HeroTile from "../components/HeroTile.astro";
+import { SITE_TITLE } from "../consts";
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <BaseHead title={`Hero Component Demo - ${SITE_TITLE}`} description="Demo page for HeroTile component" />
+  </head>
+  <body>
+    <Header />
+    <main style="max-width: 100%; padding: 0;">
+      <HeroTile
+        title="Helping people make the world a better place through quality software."
+        primaryButtonText="Read the blog"
+        primaryButtonHref="/blog"
+        secondaryButtonText="Take a course"
+        secondaryButtonHref="/about"
+        imageSrc="/placeholder-hero.svg"
+        imageAlt="Hero illustration"
+        imageOnRight={true}
+      />
+      
+      <div style="padding: 4rem 2rem; background: rgb(var(--gray-light));">
+        <h2 style="text-align: center; margin-bottom: 3rem;">Component Variations</h2>
+      </div>
+
+      <HeroTile
+        title="Build Amazing Web Experiences"
+        description="Learn modern web development with cutting-edge technologies and best practices."
+        primaryButtonText="Get Started"
+        primaryButtonHref="/blog"
+        secondaryButtonText="Learn More"
+        secondaryButtonHref="/about"
+        imageOnRight={false}
+      />
+    </main>
+    <Footer />
+  </body>
+</html>
