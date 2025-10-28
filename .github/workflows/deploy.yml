@@ -24,7 +24,14 @@ jobs:
               uses: withastro/action@v3
               env:
                   OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-                  OPENAI_MODEL: ${{ secrets.OPENAI_MODEL }}
+                  OPENAI_MODEL: ${{ vars.OPENAI_MODEL }}
+            - name: Commit modified files
+              run: |
+                  git config --local user.email "action@github.com"
+                  git config --local user.name "GitHub Action"
+                  git add -A
+                  git commit -m "chore: update generated files" || echo "No changes to commit"
+                  git push
 
     deploy:
         needs: build
