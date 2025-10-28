@@ -46,7 +46,7 @@ const {
   <div class="media-tile">
     {
       videoSrc ? (
-        <video autoplay loop muted playsinline class="hero-video">
+        <video autoplay loop muted playsinline controls class="hero-video">
           <source src={videoSrc} type="video/mp4" />
           Your browser does not support the video tag.
         </video>
@@ -61,6 +61,21 @@ const {
   </div>
 </section>
 
+<script>
+  // Respect user's reduced motion preference for video autoplay
+  document.addEventListener('DOMContentLoaded', () => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      const videos = document.querySelectorAll('.hero-video');
+      videos.forEach((video) => {
+        if (video instanceof HTMLVideoElement) {
+          video.autoplay = false;
+          video.pause();
+        }
+      });
+    }
+  });
+</script>
+
 <style>
   .hero-tile {
     display: grid;
@@ -71,10 +86,6 @@ const {
     max-width: 1400px;
     margin: 0 auto;
     min-height: 500px;
-  }
-
-  .hero-tile.image-left {
-    grid-template-columns: 1fr 1fr;
   }
 
   .hero-tile.image-left .content-tile {
@@ -184,6 +195,20 @@ const {
     justify-content: center;
     color: rgb(var(--gray));
     font-size: 1.5rem;
+  }
+
+  /* Respect user's motion preferences */
+  @media (prefers-reduced-motion: reduce) {
+    .hero-video {
+      animation: none;
+    }
+    
+    .btn,
+    .hero-tile {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 
   /* Responsive design */
