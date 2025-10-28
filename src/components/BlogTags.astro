@@ -1,0 +1,95 @@
+---
+interface Props {
+  tags?: string[];
+}
+
+const { tags = [] } = Astro.props;
+---
+
+{
+  tags && tags.length > 0 && (
+    <section class="blog-tags" aria-labelledby="tags-heading">
+      <ul class="tags-list" role="list">
+        {tags.map((tag) => (
+          <li>
+            <a
+              href={`/tags/${tag}`}
+              class="tag-link"
+              rel="tag"
+              aria-label={`View all posts tagged with ${tag}`}
+            >
+              #{tag}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}
+
+<style>
+  .blog-tags {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgb(var(--gray-light));
+  }
+
+  .tags-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: rgb(var(--gray-dark));
+    margin-bottom: 0.75rem;
+    margin-top: 0;
+  }
+
+  .tags-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .tag-link {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    background-color: color-mix(in srgb, var(--accent) 15%, white);
+    color: var(--accent-dark);
+    text-decoration: none;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+    border: 1px solid color-mix(in srgb, var(--accent) 30%, white);
+  }
+
+  .tag-link:hover {
+    background-color: var(--accent);
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px color-mix(in srgb, var(--accent) 30%, transparent);
+  }
+
+  .tag-link:focus {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  /* Responsive design */
+  @media (max-width: 720px) {
+    .blog-tags {
+      margin-top: 1.5rem;
+      padding-top: 1rem;
+    }
+
+    .tags-title {
+      font-size: 1.1rem;
+    }
+
+    .tag-link {
+      padding: 0.2rem 0.6rem;
+      font-size: 0.8rem;
+    }
+  }
+</style>

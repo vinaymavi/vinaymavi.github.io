@@ -1,0 +1,55 @@
+---
+import { getCollection } from "astro:content";
+import BlogList from "../../layouts/BlogList.astro";
+import FormattedDate from "../../components/FormattedDate.astro";
+import Image from "astro/components/Image.astro";
+
+export async function getStaticPaths() {
+  const posts = (await getCollection("blog")).sort(
+    (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+  );
+  const allTags = new Set();
+  posts.forEach((post) => {
+    if (post.data.tags?.length) {
+      post.data.tags.forEach((t) => allTags.add(t));
+    }
+  });
+
+  return Array.from(allTags).map((t) => ({
+    params: { slug: t },
+    props: { posts: posts },
+  }));
+}
+
+const { slug } = Astro.params;
+const { posts } = Astro.props;
+const filteredPosts = posts?.filter((post) => {
+  console.log(post.data);
+  return post.data.tags?.includes(slug);
+});
+---
+
+<BlogList>
+  <ul>
+    {
+      filteredPosts.map((post) => (
+        <li>
+          <a href={`/blog/${post.id}/`}>
+            {post.data.heroImage && (
+              <Image
+                width={720}
+                height={360}
+                src={post.data.heroImage}
+                alt=""
+              />
+            )}
+            <h2 class="title">{post.data.title}</h2>
+            <p class="date">
+              <FormattedDate date={post.data.pubDate} />
+            </p>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</BlogList>
