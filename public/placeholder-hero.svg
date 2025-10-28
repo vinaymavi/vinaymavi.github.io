@@ -1,0 +1,80 @@
+<svg width="600" height="600" viewBox="0 0 600 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circles for depth -->
+  <circle cx="300" cy="300" r="280" fill="#E5E9F0" opacity="0.3"/>
+  <circle cx="300" cy="300" r="200" fill="#D8DEE9" opacity="0.4"/>
+  
+  <!-- Central character placeholder -->
+  <g transform="translate(300, 320)">
+    <!-- Character body -->
+    <ellipse cx="0" cy="0" rx="80" ry="100" fill="#5E81AC"/>
+    
+    <!-- Character head -->
+    <circle cx="0" cy="-100" r="60" fill="#81A1C1"/>
+    
+    <!-- Character arms -->
+    <rect x="-90" y="-20" width="30" height="80" rx="15" fill="#5E81AC" transform="rotate(-30 -75 20)"/>
+    <rect x="60" y="-20" width="30" height="80" rx="15" fill="#5E81AC" transform="rotate(30 75 20)"/>
+    
+    <!-- Character legs -->
+    <rect x="-40" y="80" width="35" height="90" rx="17" fill="#4C566A"/>
+    <rect x="5" y="80" width="35" height="90" rx="17" fill="#4C566A"/>
+  </g>
+  
+  <!-- Floating tech elements -->
+  <!-- Laptop/Code -->
+  <g transform="translate(150, 200) rotate(-15)">
+    <rect x="0" y="0" width="60" height="45" rx="3" fill="#434C5E"/>
+    <rect x="5" y="5" width="50" height="35" fill="#88C0D0"/>
+    <line x1="10" y1="12" x2="45" y2="12" stroke="#2E3440" stroke-width="2"/>
+    <line x1="10" y1="18" x2="35" y2="18" stroke="#2E3440" stroke-width="2"/>
+    <line x1="10" y1="24" x2="40" y2="24" stroke="#2E3440" stroke-width="2"/>
+  </g>
+  
+  <!-- Cloud/Server -->
+  <g transform="translate(420, 180)">
+    <ellipse cx="20" cy="15" rx="20" ry="15" fill="#81A1C1"/>
+    <ellipse cx="40" cy="15" rx="25" ry="18" fill="#81A1C1"/>
+    <ellipse cx="60" cy="15" rx="20" ry="15" fill="#81A1C1"/>
+    <rect x="0" y="15" width="80" height="25" fill="#81A1C1" rx="5"/>
+  </g>
+  
+  <!-- Database/Storage -->
+  <g transform="translate(480, 380)">
+    <ellipse cx="25" cy="5" rx="25" ry="8" fill="#A3BE8C"/>
+    <rect x="0" y="5" width="50" height="40" fill="#A3BE8C"/>
+    <ellipse cx="25" cy="45" rx="25" ry="8" fill="#8FBCBB"/>
+  </g>
+  
+  <!-- Gears/Settings -->
+  <g transform="translate(100, 420)">
+    <circle cx="25" cy="25" r="20" fill="#B48EAD" opacity="0.8"/>
+    <circle cx="25" cy="25" r="10" fill="white"/>
+    <rect x="23" y="5" width="4" height="40" fill="#B48EAD"/>
+    <rect x="5" y="23" width="40" height="4" fill="#B48EAD"/>
+  </g>
+  
+  <!-- Mobile/Phone -->
+  <g transform="translate(520, 280) rotate(20)">
+    <rect x="0" y="0" width="35" height="60" rx="5" fill="#5E81AC"/>
+    <rect x="3" y="6" width="29" height="45" fill="#88C0D0"/>
+    <circle cx="17.5" cy="55" r="3" fill="#E5E9F0"/>
+  </g>
+  
+  <!-- Abstract shapes -->
+  <circle cx="180" cy="120" r="12" fill="#D08770" opacity="0.6"/>
+  <circle cx="450" cy="450" r="15" fill="#EBCB8B" opacity="0.6"/>
+  <path d="M 80 300 L 95 310 L 80 320 Z" fill="#88C0D0" opacity="0.7"/>
+  <path d="M 530 220 L 545 230 L 530 240 Z" fill="#A3BE8C" opacity="0.7" transform="rotate(45 537.5 230)"/>
+  
+  <!-- Soccer ball -->
+  <g transform="translate(220, 480)">
+    <circle cx="20" cy="20" r="18" fill="white" stroke="#2E3440" stroke-width="2"/>
+    <path d="M 20 5 L 25 15 L 20 20 L 15 15 Z" fill="#2E3440"/>
+    <path d="M 25 15 L 35 20 L 30 28" stroke="#2E3440" stroke-width="2" fill="none"/>
+  </g>
+  
+  <!-- Additional floating elements -->
+  <rect x="380" y="100" width="25" height="25" rx="3" fill="#BF616A" opacity="0.5" transform="rotate(30 392.5 112.5)"/>
+  <circle cx="140" cy="340" r="10" fill="#8FBCBB" opacity="0.6"/>
+  <path d="M 500 150 L 515 140 L 520 155 Z" fill="#EBCB8B" opacity="0.7"/>
+</svg>
