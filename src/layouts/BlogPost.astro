@@ -1,6 +1,7 @@
 ---
 import { Image } from "astro:assets";
 import type { CollectionEntry } from "astro:content";
+import BackToTop from "../components/BackToTop.astro";
 import BaseHead from "../components/BaseHead.astro";
 import BlogTags from "../components/BlogTags.astro";
 import Footer from "../components/Footer.astro";
@@ -96,5 +97,7 @@ const { title, description, pubDate, updatedDate, heroImage, tags } =
       </article>
     </main>
     <Footer />
+    <BackToTop visibilityThreshold={1} />
+    <!-- visibilityThreshold: Number of viewport heights (vh) to scroll before button appears -->
   </body>
 </html>

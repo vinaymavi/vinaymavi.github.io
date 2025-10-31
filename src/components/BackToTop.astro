@@ -1,0 +1,143 @@
+---
+interface Props {
+  /**
+   * The scroll distance (in viewport heights) after which the button becomes visible.
+   * Default: 1 (100vh - one full screen height)
+   */
+  visibilityThreshold?: number;
+}
+
+const { visibilityThreshold = 1 } = Astro.props;
+---
+
+<button
+  id="back-to-top"
+  aria-label="Back to top"
+  data-threshold={visibilityThreshold}
+  title="Back to top"
+>
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <polyline points="18 15 12 9 6 15"></polyline>
+  </svg>
+</button>
+
+<style>
+  #back-to-top {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    background-color: var(--accent);
+    color: white;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--box-shadow);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease,
+      background-color 0.2s ease;
+    z-index: 1000;
+    transform: translateY(10px);
+  }
+
+  #back-to-top.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  #back-to-top:hover {
+    background-color: var(--accent-dark);
+    transform: translateY(-2px);
+  }
+
+  #back-to-top:active {
+    transform: translateY(0);
+  }
+
+  /* Tablet and Mobile styles */
+  @media (max-width: 1024px) {
+    #back-to-top {
+      bottom: 1.5rem;
+      right: 1.5rem;
+      width: 2.75rem;
+      height: 2.75rem;
+    }
+  }
+
+  @media (max-width: 720px) {
+    #back-to-top {
+      bottom: 1rem;
+      right: 1rem;
+      width: 2.5rem;
+      height: 2.5rem;
+    }
+  }
+
+  /* Ensure button doesn't interfere with touch targets on mobile */
+  @media (hover: none) and (pointer: coarse) {
+    #back-to-top {
+      /* Slightly larger touch target for mobile */
+      min-width: 44px;
+      min-height: 44px;
+    }
+  }
+</style>
+
+<script>
+  function initBackToTop() {
+    const backToTopButton = document.getElementById("back-to-top");
+    if (!backToTopButton) return;
+
+    const threshold = parseFloat(
+      backToTopButton.getAttribute("data-threshold") || "1"
+    );
+    const thresholdPx = window.innerHeight * threshold;
+
+    // Show/hide button based on scroll position
+    function toggleVisibility() {
+      if (window.scrollY > thresholdPx) {
+        backToTopButton.classList.add("visible");
+      } else {
+        backToTopButton.classList.remove("visible");
+      }
+    }
+
+    // Scroll to top smoothly
+    function scrollToTop(e) {
+      e.preventDefault();
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+    }
+
+    // Add event listeners
+    window.addEventListener("scroll", toggleVisibility, { passive: true });
+    backToTopButton.addEventListener("click", scrollToTop);
+
+    // Initial check
+    toggleVisibility();
+  }
+
+  // Initialize on page load
+  initBackToTop();
+
+  // Reinitialize on view transitions (Astro's client-side routing)
+  document.addEventListener("astro:page-load", initBackToTop);
+</script>
