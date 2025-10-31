@@ -1,4 +1,5 @@
 # Astro Starter Kit: Blog
+[![Deploy to GitHub Pages](https://github.com/vinaymavi/vinaymavi.github.io/actions/workflows/deploy.yml/badge.svg)](https://github.com/vinaymavi/vinaymavi.github.io/actions/workflows/deploy.yml)
 
 ```sh
 npm create astro@latest -- --template blog
