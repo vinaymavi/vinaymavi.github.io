@@ -119,7 +119,7 @@ const { visibilityThreshold = 1 } = Astro.props;
     }
 
     // Scroll to top smoothly
-    function scrollToTop(e: Event) {
+    function scrollToTop(e) {
       e.preventDefault();
       window.scrollTo({
         top: 0,
