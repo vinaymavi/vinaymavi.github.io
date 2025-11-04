@@ -1,4 +1,5 @@
 ---
+import "../styles/global.css";
 import { Image } from "astro:assets";
 import type { CollectionEntry } from "astro:content";
 import BackToTop from "../components/BackToTop.astro";
@@ -82,7 +83,7 @@ const { title, description, pubDate, updatedDate, heroImage, tags } =
         <div class="hero-image">
           {
             heroImage && (
-              <Image width={1020} height={510} src={heroImage} alt="" />
+              <Image width={1020} height={510} src={heroImage} alt={title} />
             )
           }
         </div>

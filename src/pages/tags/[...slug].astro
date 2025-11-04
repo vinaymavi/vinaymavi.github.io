@@ -24,7 +24,6 @@ export async function getStaticPaths() {
 const { slug } = Astro.params;
 const { posts } = Astro.props;
 const filteredPosts = posts?.filter((post) => {
-  console.log(post.data);
   return post.data.tags?.includes(slug);
 });
 ---
