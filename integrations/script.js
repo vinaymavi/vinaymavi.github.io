@@ -1,3 +1,4 @@
+// This file is just to test this script locally.
 import { generateTagsForBlog } from "./auto-tags.js";
 
 // Read command line arguments
