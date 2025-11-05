@@ -8,16 +8,14 @@ import { SITE_TITLE } from "../consts";
 
 interface Props {
   title: string;
-  id: string;
   description: string;
   image?: ImageMetadata;
+  slug?: string;
 }
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
-const pathname = Astro.url.pathname;
 
-const { title, description, id, image = FallbackImage } = Astro.props;
-const { slug } = Astro.params;
+const { title, description, slug, image = FallbackImage } = Astro.props;
 ---
 
 <!-- Global Metadata -->
@@ -62,10 +60,7 @@ const { slug } = Astro.params;
 <meta property="og:url" content={canonicalURL} />
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
-<meta
-  property="og:image"
-  content={new URL(`/og/${pathname}.png`, Astro.site)}
-/>
+<meta property="og:image" content={new URL(`/og/${slug}.png`, Astro.site)} />
 
 <!-- Twitter -->
 <meta property="twitter:card" content="summary_large_image" />

@@ -12,12 +12,13 @@ export interface Props {
 }
 
 const { title = SITE_TITLE, description = SITE_DESCRIPTION } = Astro.props;
+const { slug } = Astro.params;
 ---
 
 <!doctype html>
 <html lang="en">
   <head>
-    <BaseHead title={title} description={description} />
+    <BaseHead title={title} description={description} slug={slug} />
     <style is:global>
       main {
         width: 960px;
