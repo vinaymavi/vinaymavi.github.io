@@ -34,7 +34,7 @@ export const OgImage = ({ title }: { title: string }) => {
               fontWeight: "600",
             }}
           >
-            @viaymavi
+            @vinaymavi
           </h2>
         </div>
       </div>
