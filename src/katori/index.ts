@@ -23,7 +23,6 @@ const options = {
 };
 
 export async function katori(html: ReactNode): Promise<string> {
-  console.log(`passed HTML - ${html}`);
   const svg = await satori(html, options);
   return svg;
 }

@@ -16,10 +16,24 @@ export const OgImage = ({ title }: { title: string }) => {
           className="bg-white  border-4 border-gray-700  text-center flex flex-col w-full h-full items-center justify-center p-5 -ml-10 -mb-10 rounded-lg"
           tw="bg-white  border-4 border-gray-700  text-center flex flex-col w-full h-full items-center justify-center p-5 -ml-10 -mb-10 rounded-lg"
         >
-          <h1 className="text-4xl flex font-bold" tw="text-4xl flex font-bold">
+          <h1
+            className="text-4xl flex"
+            tw="text-4xl flex"
+            style={{
+              fontSize: "50px",
+              fontWeight: "800",
+            }}
+          >
             {title}
           </h1>
-          <h2 className="text-lg flexmt-4 pt-3" tw="text-lg flexmt-4 pt-3">
+          <h2
+            className="text-lg flex mt-4 pt-3"
+            tw="text-lg flex mt-4 pt-3"
+            style={{
+              fontSize: "30px",
+              fontWeight: "600",
+            }}
+          >
             @viaymavi
           </h2>
         </div>
