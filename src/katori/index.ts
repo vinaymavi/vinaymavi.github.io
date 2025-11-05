@@ -5,7 +5,7 @@ const { robotoItalicBuffer, robotoRegularBuffer } = getRobotoFonts();
 
 const options = {
   width: 1200,
-  height: 800,
+  height: 630,
   fonts: [
     {
       name: "Roboto",
