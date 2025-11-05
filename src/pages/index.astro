@@ -1,9 +1,14 @@
 ---
-import { ClientRouter } from "astro:transitions";
+import { ClientRouter, fade } from "astro:transitions";
 import BaseHead from "../components/BaseHead.astro";
 import Footer from "../components/Footer.astro";
 import Header from "../components/Header.astro";
 import { SITE_DESCRIPTION, SITE_TITLE } from "../consts";
+import HeroTile from "../components/HeroTile.astro";
+import panda from "../assets/profile/panda-p5.png";
+import cat from "../assets/profile/eagle.png";
+import tiger from "../assets/profile/tiger.png";
+import { INTRO2, INTRO3 } from "../consts";
 ---
 
 <!doctype html>
@@ -12,7 +17,6 @@ import { SITE_DESCRIPTION, SITE_TITLE } from "../consts";
     <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
     <style>
       main {
-        max-width: 800px;
         margin: 0 auto;
         padding: 2rem;
         font-family: "Arial", sans-serif;
@@ -55,44 +59,32 @@ import { SITE_DESCRIPTION, SITE_TITLE } from "../consts";
   <body>
     <Header />
     <main>
-      <h1>🧑‍🚀 Welcome to Vinay Kumar's Blog</h1>
-      <div class="intro">
-        <p>
-          With over 13 years of experience in architecting modern applications
-          using cutting-edge technologies, I’m excited to share insights on
-          software development, AI, and more. Explore my journey, learn from my
-          expertise, and connect with me through my blog posts.
-        </p>
-      </div>
-      <div class="skills">
-        <div class="skill-card">Front End: JavaScript, React, Next.js</div>
-        <div class="skill-card">Back End: Node.js, Python, FastAPI</div>
-        <div class="skill-card">AI: OpenAI, Claude, Grok, LangChain</div>
-        <div class="skill-card">Cloud: AWS, GCP, Docker</div>
-      </div>
-      <div class="blog-preview">
-        <h2>Latest Blog Posts</h2>
-        <ul>
-          <li>
-            <a href="/blog/ai-invoice-bot"
-              >AI Invoice Bot: Automating Payments</a
-            >
-          </li>
-          <li>
-            <a href="/blog/ai-driven-video"
-              >AI-Driven Video Creation Techniques</a
-            >
-          </li>
-        </ul>
-        <p><a href="/blog">View All Posts</a></p>
-      </div>
-      <p>
-        Have questions or ideas to collaborate? Feel free to reach out via <a
-          href="mailto:vinaymavi@gmail.com">email</a
-        > or connect on <a
-          href="https://www.linkedin.com/in/vinay-kumar-b6820154/">LinkedIn</a
-        >.
-      </p>
+      <HeroTile
+        title="Experimenting with AI technologies at scale to better serve the companies and clients I work for."
+        primaryButtonText="Know More"
+        primaryButtonHref="#"
+        imageSrc={panda}
+        imageAlt="Hero image"
+        imageOnRight={true}
+      />
+      <HeroTile
+        title={"Hi, I'm Vinay Mavi. "}
+        description={INTRO2}
+        primaryButtonHref="/blog/how-ai-agents-are-revolutionizing-team-dynamics-in-modern-software-development/"
+        primaryButtonText="Know more"
+        imageSrc={cat}
+        imageAlt="Hero image"
+        imageOnRight={false}
+      />
+      <HeroTile
+        title={"Well, you're in the right place."}
+        description={INTRO3}
+        primaryButtonHref="mailto:vinaymavi@gmail.com"
+        primaryButtonText="Contact me"
+        imageSrc={tiger}
+        imageAlt="Hero image"
+        imageOnRight={true}
+      />
     </main>
     <Footer />
   </body>

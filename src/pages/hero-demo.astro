@@ -4,6 +4,7 @@ import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import HeroTile from "../components/HeroTile.astro";
 import { SITE_TITLE } from "../consts";
+import heroImage from "../assets/blog-placeholder-1.jpg";
 ---
 
 <!doctype html>
@@ -23,7 +24,7 @@ import { SITE_TITLE } from "../consts";
         primaryButtonHref="/blog"
         secondaryButtonText="Take a course"
         secondaryButtonHref="/about"
-        imageSrc="/placeholder-hero.svg"
+        imageSrc={heroImage}
         imageAlt="Hero illustration"
         imageOnRight={true}
       />
