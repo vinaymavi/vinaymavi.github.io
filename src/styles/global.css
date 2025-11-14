@@ -100,6 +100,21 @@ input {
 }
 table {
 	width: 100%;
+	border-collapse: collapse;
+}
+table thead tr {
+	border-bottom: 2px solid rgb(var(--gray-dark));
+}
+table tbody tr {
+	border-bottom: 1px solid rgb(var(--gray-light));
+}
+table th,
+table td {
+	padding: 0.5em 1em;
+	text-align: left;
+}
+table th {
+	font-weight: 700;
 }
 img {
 	max-width: 100%;
