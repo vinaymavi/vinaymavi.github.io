@@ -103,18 +103,15 @@ table {
 	border-collapse: collapse;
 }
 table thead tr {
-	border-bottom: 2px solid rgb(var(--gray-dark));
+	border-bottom: 2px solid var(--accent);
 }
 table tbody tr {
-	border-bottom: 1px solid rgb(var(--gray-light));
+	border-bottom: 1px solid var(--accent);
 }
 table th,
 table td {
 	padding: 0.5em 1em;
 	text-align: left;
-}
-table th {
-	font-weight: 700;
 }
 img {
 	max-width: 100%;
