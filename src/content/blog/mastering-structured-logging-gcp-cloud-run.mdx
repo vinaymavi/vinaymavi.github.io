@@ -1,0 +1,848 @@
+---
+title: 'Mastering Structured Logging in GCP Cloud Run: A Comprehensive Guide'
+description: 'Learn how to implement production-grade structured logging in GCP Cloud Run without any GCP SDK. Discover the magic of stdout + JSON + severity field for seamless log integration. Complete guide with FastAPI, structlog, code examples, deployment steps, and troubleshooting tips.'
+pubDate: 'Nov 14 2025'
+heroImage: '../../assets/mastering-structured-logging-gcp-cloud-run.png'
+tags: ["GCP", "CLOUD-RUN", "LOGGING", "PYTHON", "FASTAPI", "DEVOPS", "OBSERVABILITY", "STRUCTLOG"]
+---
+
+
+## Introduction
+
+When deploying containerized applications to Google Cloud Platform (GCP) Cloud Run, proper logging is crucial for monitoring, debugging, and maintaining production systems. This guide demonstrates how to implement structured logging in a FastAPI application that integrates seamlessly with GCP Cloud Logging.
+
+**Repository:** [https://github.com/vinaymavi/blog-fastapi-gcp-logging](https://github.com/vinaymavi/blog-fastapi-gcp-logging)
+
+---
+
+## Why Proper Logging Matters
+
+### 1. **Observability in Production**
+Without proper logging, debugging production issues becomes nearly impossible. Structured logs provide:
+- Real-time visibility into application behavior
+- Historical data for post-mortem analysis
+- Performance metrics and bottleneck identification
+
+### 2. **Compliance and Audit Requirements**
+Many industries require:
+- Detailed audit trails for security events
+- Retention policies for regulatory compliance
+- Traceable request flows through distributed systems
+
+### 3. **Cost Optimization**
+Efficient logging helps:
+- Identify resource-intensive operations
+- Detect anomalies before they cause outages
+- Reduce mean time to resolution (MTTR)
+
+### 4. **Operational Excellence**
+Proper logging enables:
+- Proactive monitoring and alerting
+- SLA tracking and reporting
+- Data-driven decision making
+
+---
+
+## How GCP Cloud Run Reads Container Logs
+
+### The Magic Behind the Scenes
+
+**The beauty of Cloud Run logging is its simplicity:** You don't need any GCP-specific logging libraries. When your application runs on Cloud Run, GCP automatically captures everything written to stdout/stderr and ingests it into Cloud Logging.
+
+### Log Ingestion Flow
+
+```
+Your Application → stdout (JSON) → Cloud Run Runtime → Cloud Logging Agent → Cloud Logging API → Logs Explorer
+```
+
+#### 1. **Standard Output/Error Streams**
+Cloud Run captures anything written to `stdout` and `stderr` from your container:
+- Write JSON to `stdout` = Structured logs in GCP
+- Write plain text to `stdout` = Text logs in GCP
+- Write to `stderr` = Error logs in GCP
+
+**No GCP SDK required!** The Cloud Run environment handles log collection automatically.
+
+#### 2. **Log Format Detection**
+GCP Cloud Logging automatically detects and parses:
+- **JSON logs**: Structured data with automatic field extraction into `jsonPayload`
+- **Text logs**: Unstructured plain text entries into `textPayload`
+- **Special fields**: Severity, timestamp, trace, and more
+
+#### 3. **Severity Level Mapping**
+Cloud Logging recognizes the `severity` field in JSON logs:
+
+| Python Level | GCP Severity | JSON Field | Icon in Console |
+|--------------|--------------|------------|-----------------|
+| DEBUG        | DEBUG        | `"severity": "DEBUG"` | 🔍 Debug        |
+| INFO         | INFO         | `"severity": "INFO"` | ℹ️ Info         |
+| WARNING      | WARNING      | `"severity": "WARNING"` | ⚠️ Warning      |
+| ERROR        | ERROR        | `"severity": "ERROR"` | ❌ Error        |
+| CRITICAL     | CRITICAL     | `"severity": "CRITICAL"` | 🔴 Critical     |
+
+**Key Point:** The `severity` field must be uppercase and at the root level of the JSON object.
+
+---
+
+## What Enables Proper Display in GCP Cloud Logging
+
+### The Secret: It's All About stdout + JSON + severity
+
+When running on Cloud Run, GCP automatically captures your container's stdout. The key is to structure your logs correctly:
+
+### Key Requirements for GCP Cloud Logging Integration
+
+#### 1. **Write to stdout (Not Files or stderr for structured logs)**
+```python
+import sys
+import logging
+
+# Configure logging to stdout
+logging.basicConfig(stream=sys.stdout)
+```
+
+**Why stdout?**
+- Cloud Run captures stdout automatically
+- No file system access needed
+- Works seamlessly with Cloud Logging Agent
+
+#### 2. **JSON Format**
+Logs must be valid JSON for structured logging:
+```json
+{
+  "severity": "INFO",
+  "message": "User request processed",
+  "timestamp": "2024-01-15T10:30:00.000Z",
+  "user_id": "12345",
+  "request_id": "abc-123"
+}
+```
+
+**What happens:**
+- GCP detects JSON in stdout
+- Parses it into `jsonPayload` in Logs Explorer
+- All fields become searchable
+
+#### 3. **Severity Field (The Magic Field!)**
+Include `severity` field at the root level matching GCP's expected values:
+
+```json
+{
+  "severity": "ERROR",  ✅ At root level, uppercase
+  "message": "Something went wrong"
+}
+```
+
+**Requirements:**
+- Must be at the **root level** of JSON (not nested)
+- Must be **uppercase**: `DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL`
+- Field name must be exactly **`severity`**
+
+**What happens without it:**
+```json
+{
+  "level": "error",     ❌ Wrong field name
+  "message": "test"     
+}
+// Result: Shows as DEFAULT severity in GCP
+```
+
+#### 4. **Timestamp Field (Optional but Recommended)**
+ISO 8601 format ensures correct temporal ordering:
+```json
+{
+  "timestamp": "2024-01-15T10:30:00.123456Z",
+  "severity": "INFO",
+  "message": "Event logged"
+}
+```
+
+**If omitted:** GCP uses the time when the log was received.
+
+#### 5. **Special GCP Fields** (Optional but Powerful)
+
+These fields enable advanced features:
+
+| Field | Purpose | Example |
+|-------|---------|---------|
+| `logging.googleapis.com/trace` | Distributed tracing | `projects/[PROJECT]/traces/[TRACE_ID]` |
+| `logging.googleapis.com/spanId` | Span identification | `000000000000004a` |
+| `logging.googleapis.com/sourceLocation` | Source code location | `{"file": "main.py", "line": "42"}` |
+| `httpRequest` | HTTP request details | `{"requestMethod": "GET", "status": 200}` |
+
+### Complete Example
+
+```json
+{
+  "severity": "ERROR",
+  "timestamp": "2024-01-15T10:30:00.123456Z",
+  "message": "Database connection failed",
+  "user_id": "12345",
+  "request_id": "abc-123",
+  "error_code": "DB_CONN_TIMEOUT",
+  "httpRequest": {
+    "requestMethod": "POST",
+    "requestUrl": "/api/users",
+    "status": 500,
+    "userAgent": "Mozilla/5.0..."
+  }
+}
+```
+
+This log entry will:
+- ✅ Show with ERROR severity (red icon) in Logs Explorer
+- ✅ Have all fields searchable: `jsonPayload.user_id="12345"`
+- ✅ Display HTTP request details in a structured format
+- ✅ Be properly timestamped
+
+---
+
+## Prerequisites
+
+Before starting, ensure you have:
+
+- **Python 3.11+** installed
+- **GCP Account** with billing enabled
+- **gcloud CLI** installed and configured
+- **Docker** (optional, for local testing)
+- Basic knowledge of FastAPI and Python logging
+
+---
+
+## Implementation Guide
+
+### Step 1: Project Setup
+
+Create a new directory and initialize the project:
+
+```bash
+mkdir fastapi-gcp-logging
+cd fastapi-gcp-logging
+```
+
+### Step 2: Define Dependencies
+
+Create `requirements.txt`:
+
+```txt
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+structlog==24.1.0
+```
+
+**Why these dependencies?**
+- **FastAPI**: Modern, fast web framework
+- **Uvicorn**: ASGI server for production
+- **Structlog**: Structured logging library with JSON output
+
+**Note:** No GCP-specific logging library is needed! When running on Cloud Run, GCP automatically captures JSON logs from stdout.
+
+Install dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+### Step 3: Create the FastAPI Application
+
+Create `main.py`:
+
+```python
+import structlog
+from fastapi import FastAPI, Request
+import os
+import logging
+import sys
+
+# Configure standard logging to stdout
+logging.basicConfig(
+    format="%(message)s",
+    stream=sys.stdout,
+    level=logging.INFO,
+)
+
+# Custom processor to map log levels to GCP severity
+def add_gcp_severity(logger, method_name, event_dict):
+    """
+    Add GCP-compatible severity field based on log level.
+    GCP Cloud Logging recognizes: DEFAULT, DEBUG, INFO, NOTICE, WARNING, ERROR, CRITICAL, ALERT, EMERGENCY
+    """
+    level = event_dict.get("level", "").upper()
+    
+    # Map Python log levels to GCP severity levels
+    severity_mapping = {
+        "DEBUG": "DEBUG",
+        "INFO": "INFO",
+        "WARNING": "WARNING",
+        "ERROR": "ERROR",
+        "CRITICAL": "CRITICAL",
+    }
+    
+    # Add severity field for GCP
+    event_dict["severity"] = severity_mapping.get(level, "DEFAULT")
+    
+    return event_dict
+
+# Configure structlog to output JSON to stdout with GCP severity
+# GCP Cloud Logging automatically ingests JSON logs from stdout
+structlog.configure(
+    processors=[
+        structlog.stdlib.filter_by_level,
+        structlog.stdlib.add_logger_name,
+        structlog.stdlib.add_log_level,
+        structlog.stdlib.PositionalArgumentsFormatter(),
+        structlog.processors.TimeStamper(fmt="iso"),
+        structlog.processors.StackInfoRenderer(),
+        structlog.processors.format_exc_info,
+        structlog.processors.UnicodeDecoder(),
+        add_gcp_severity,  # Add GCP severity mapping
+        structlog.processors.JSONRenderer(),
+    ],
+    context_class=dict,
+    logger_factory=structlog.stdlib.LoggerFactory(),
+    cache_logger_on_first_use=True,
+)
+
+app = FastAPI(title="FastAPI GCP Logging Example")
+logger = structlog.get_logger()
+
+
+@app.api_route("/info", methods=["GET", "POST", "PUT", "DELETE"])
+async def info_log(request: Request):
+    """Log at INFO level"""
+    body = await request.body()
+    logger.info(
+        "Info level log",
+        method=request.method,
+        path=request.url.path,
+        client_ip=request.client.host,
+        body=body.decode() if body else None
+    )
+    return {"level": "INFO", "message": "Logged at INFO level"}
+
+
+@app.api_route("/error", methods=["GET", "POST", "PUT", "DELETE"])
+async def error_log(request: Request):
+    """Log at ERROR level"""
+    body = await request.body()
+    logger.error(
+        "Error level log",
+        method=request.method,
+        path=request.url.path,
+        client_ip=request.client.host,
+        body=body.decode() if body else None
+    )
+    return {"level": "ERROR", "message": "Logged at ERROR level"}
+
+
+@app.get("/")
+async def root():
+    """Root endpoint with API information"""
+    logger.info("Root endpoint accessed")
+    return {
+        "message": "FastAPI GCP Logging Example",
+        "endpoints": {
+            "/info": "Log at INFO level",
+            "/error": "Log at ERROR level"
+        }
+    }
+
+
+if __name__ == "__main__":
+    import uvicorn
+    port = int(os.getenv("PORT", 8080))
+    uvicorn.run(app, host="0.0.0.0", port=port)
+```
+
+### Step 4: Create Dockerfile
+
+Create `Dockerfile`:
+
+```dockerfile
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Copy requirements and install dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application code
+COPY main.py .
+
+# Expose port
+EXPOSE 8080
+
+# Set environment variable for GCP
+ENV PORT=8080
+
+# Run the application
+CMD ["/bin/sh", "-c", "exec uvicorn main:app --host 0.0.0.0 --port ${PORT}"]
+```
+
+---
+
+## Understanding the Components
+
+### 1. Standard Logging to stdout
+
+```python
+import logging
+import sys
+
+logging.basicConfig(
+    format="%(message)s",
+    stream=sys.stdout,
+    level=logging.INFO,
+)
+```
+
+**Why this matters:**
+- Directs all logs to `stdout` (not stderr or files)
+- Uses simple format (structlog handles the actual formatting)
+- Sets base logging level to INFO (can be overridden)
+
+### 2. Custom GCP Severity Processor
+
+```python
+def add_gcp_severity(logger, method_name, event_dict):
+    """
+    Add GCP-compatible severity field based on log level.
+    """
+    level = event_dict.get("level", "").upper()
+    
+    severity_mapping = {
+        "DEBUG": "DEBUG",
+        "INFO": "INFO",
+        "WARNING": "WARNING",
+        "ERROR": "ERROR",
+        "CRITICAL": "CRITICAL",
+    }
+    
+    event_dict["severity"] = severity_mapping.get(level, "DEFAULT")
+    return event_dict
+```
+
+**This is the key to GCP integration:**
+- Adds a `severity` field to each log entry
+- Maps Python log levels to GCP severity levels
+- GCP automatically recognizes and uses this field
+- **No GCP SDK needed** - just the right JSON structure!
+
+### 3. Structlog Configuration
+
+```python
+structlog.configure(
+    processors=[
+        structlog.stdlib.filter_by_level,           # Filter logs by configured level
+        structlog.stdlib.add_logger_name,           # Add logger name to context
+        structlog.stdlib.add_log_level,             # Add log level to output
+        structlog.stdlib.PositionalArgumentsFormatter(),  # Format positional args
+        structlog.processors.TimeStamper(fmt="iso"), # Add ISO 8601 timestamp
+        structlog.processors.StackInfoRenderer(),    # Render stack traces
+        structlog.processors.format_exc_info,        # Format exception info
+        structlog.processors.UnicodeDecoder(),       # Decode unicode strings
+        add_gcp_severity,                           # ⭐ Add GCP severity field
+        structlog.processors.JSONRenderer(),        # Output as JSON
+    ],
+    context_class=dict,
+    logger_factory=structlog.stdlib.LoggerFactory(),
+    cache_logger_on_first_use=True,
+)
+```
+
+**Key Points:**
+- **JSONRenderer**: Ensures logs are in JSON format for GCP
+- **TimeStamper**: Adds ISO 8601 timestamps
+- **add_gcp_severity**: ⭐ The magic sauce that makes GCP recognize severity levels
+- **Order matters**: `add_gcp_severity` must come before `JSONRenderer`
+
+### 4. Example Log Output
+
+When you call `logger.info()`, structlog outputs to stdout:
+
+```json
+{
+  "event": "Info level log",
+  "method": "POST",
+  "path": "/info",
+  "client_ip": "203.0.113.1",
+  "body": "{\"key\": \"value\"}",
+  "timestamp": "2024-01-15T14:32:10.123456Z",
+  "level": "info",
+  "logger": "main",
+  "severity": "INFO"
+}
+```
+
+**What happens in GCP Cloud Run:**
+1. Your app writes JSON to stdout
+2. Cloud Run runtime captures it
+3. Cloud Logging Agent parses the JSON
+4. The `severity` field determines the log level
+5. All other fields go into `jsonPayload`
+6. Logs appear in Logs Explorer with correct severity icons
+
+---
+
+## Deployment
+
+### Local Testing
+
+Test locally before deploying:
+
+```bash
+# Run the application
+python main.py
+
+# Test in another terminal
+curl http://localhost:8080/info
+curl -X POST http://localhost:8080/error -d '{"test": "data"}'
+```
+
+### Deploy to GCP Cloud Run
+
+#### 1. Set Your GCP Project
+
+```bash
+gcloud config set project YOUR_PROJECT_ID
+```
+
+#### 2. Deploy Using Source-Based Deployment
+
+```bash
+gcloud run deploy fastapi-logging-demo \
+  --source . \
+  --region us-central1 \
+  --allow-unauthenticated \
+  --platform managed
+```
+
+This command:
+- Builds the container using Cloud Build
+- Deploys to Cloud Run in us-central1
+- Allows public access (unauthenticated)
+
+#### 3. Alternative: Deploy Pre-Built Image
+
+```bash
+# Build and push to Artifact Registry
+gcloud builds submit --tag gcr.io/YOUR_PROJECT_ID/fastapi-logging
+
+# Deploy the image
+gcloud run deploy fastapi-logging-demo \
+  --image gcr.io/YOUR_PROJECT_ID/fastapi-logging \
+  --region us-central1 \
+  --allow-unauthenticated
+```
+
+---
+
+## Testing and Validation
+
+### Generate Test Logs
+
+After deployment, get your Cloud Run URL:
+
+```bash
+SERVICE_URL=$(gcloud run services describe fastapi-logging-demo \
+  --region us-central1 \
+  --format 'value(status.url)')
+
+echo $SERVICE_URL
+```
+
+Test different log levels:
+
+```bash
+# INFO level
+curl $SERVICE_URL/info
+
+# ERROR level with payload
+curl -X POST $SERVICE_URL/error \
+  -H "Content-Type: application/json" \
+  -d '{"user_id": "123", "action": "test"}'
+
+# WARNING level
+curl $SERVICE_URL/warning
+
+# CRITICAL level
+curl $SERVICE_URL/critical
+```
+
+### View Logs in GCP Console
+
+1. **Navigate to Cloud Logging:**
+   - Go to [GCP Console](https://console.cloud.google.com)
+   - Select **Logging** > **Logs Explorer**
+
+2. **Filter by Service:**
+   ```
+   resource.type="cloud_run_revision"
+   resource.labels.service_name="fastapi-logging-demo"
+   ```
+
+3. **Filter by Severity:**
+   - Use the severity dropdown
+   - Or add to query: `severity>=ERROR`
+
+4. **Search Structured Fields:**
+   ```
+   jsonPayload.method="POST"
+   jsonPayload.client_ip!=""
+   ```
+
+### Using gcloud CLI
+
+View logs from command line:
+
+```bash
+# Recent logs
+gcloud logging read "resource.type=cloud_run_revision" --limit 50
+
+# Filter by severity
+gcloud logging read "resource.type=cloud_run_revision AND severity=ERROR" --limit 20
+
+# Filter by time
+gcloud logging read "resource.type=cloud_run_revision AND timestamp>=\"2024-01-15T00:00:00Z\"" --limit 30
+```
+
+---
+
+## Best Practices
+
+### 1. **Use Structured Logging Always**
+
+❌ **Bad:**
+```python
+print(f"User {user_id} logged in from {ip}")
+```
+
+✅ **Good:**
+```python
+logger.info("User logged in", user_id=user_id, ip_address=ip, session_id=session_id)
+```
+
+### 2. **Include Request Context**
+
+Always log relevant context:
+```python
+logger.info(
+    "Request processed",
+    method=request.method,
+    path=request.url.path,
+    user_agent=request.headers.get("user-agent"),
+    request_id=request_id,
+    duration_ms=duration
+)
+```
+
+### 3. **Set Appropriate Log Levels**
+
+| Level | Use Case |
+|-------|----------|
+| DEBUG | Detailed diagnostic information (disable in production) |
+| INFO | General informational messages, normal operations |
+| WARNING | Warning messages, degraded functionality |
+| ERROR | Error events, but application continues |
+| CRITICAL | Critical issues, application may not continue |
+
+### 4. **Add Correlation IDs**
+
+For distributed tracing:
+```python
+import uuid
+
+@app.middleware("http")
+async def add_correlation_id(request: Request, call_next):
+    correlation_id = request.headers.get("X-Correlation-ID", str(uuid.uuid4()))
+    
+    with structlog.contextvars.bind_contextvars(correlation_id=correlation_id):
+        response = await call_next(request)
+    
+    response.headers["X-Correlation-ID"] = correlation_id
+    return response
+```
+
+### 5. **Sanitize Sensitive Data**
+
+Never log:
+- Passwords or API keys
+- Credit card numbers
+- Personal identifiable information (PII)
+
+```python
+def sanitize_payload(data: dict) -> dict:
+    sensitive_fields = ["password", "token", "api_key", "ssn"]
+    return {k: "***REDACTED***" if k in sensitive_fields else v 
+            for k, v in data.items()}
+
+logger.info("User data", payload=sanitize_payload(user_data))
+```
+
+### 6. **Set Log Retention Policies**
+
+Configure retention in GCP:
+```bash
+gcloud logging buckets update _Default \
+  --location=global \
+  --retention-days=30
+```
+
+### 7. **Monitor Log Volume and Costs**
+
+```bash
+# Check log volume
+gcloud logging read "resource.type=cloud_run_revision" \
+  --format="table(timestamp, severity)" \
+  --limit 1000 | wc -l
+```
+
+### 8. **Use Log-Based Metrics**
+
+Create metrics from logs:
+```bash
+gcloud logging metrics create error_rate \
+  --description="Rate of ERROR level logs" \
+  --log-filter='resource.type="cloud_run_revision" AND severity=ERROR'
+```
+
+---
+
+## Troubleshooting
+
+### Issue 1: Logs Not Appearing in Cloud Logging
+
+**Symptoms:** Logs visible locally but not in GCP Console
+
+**Solutions:**
+1. Verify logs are written to stdout (not stderr or files):
+   ```python
+   import sys
+   print("Test log", file=sys.stdout, flush=True)
+   ```
+
+2. Ensure logging is configured to use stdout:
+   ```python
+   import logging
+   import sys
+   logging.basicConfig(stream=sys.stdout)
+   ```
+
+3. Check that your app is actually running on Cloud Run (not Cloud Functions or GKE)
+
+4. Verify JSON format is correct:
+   ```python
+   import json
+   print(json.dumps({"message": "test", "severity": "INFO"}))
+   ```
+
+**Note:** Cloud Run automatically captures stdout. No service account configuration needed for logging!
+
+### Issue 2: Incorrect Severity Levels
+
+**Symptoms:** All logs appear as INFO or DEFAULT level
+
+**Solutions:**
+1. Ensure `severity` field is uppercase and at root level:
+   ```json
+   {"severity": "ERROR", "message": "test"}  ✅ Correct
+   {"Severity": "error", "message": "test"}  ❌ Wrong
+   {"data": {"severity": "ERROR"}}           ❌ Wrong (nested)
+   ```
+
+2. Verify the custom severity processor is in the processor chain:
+   ```python
+   structlog.configure(
+       processors=[
+           # ... other processors ...
+           add_gcp_severity,  # Must be before JSONRenderer
+           structlog.processors.JSONRenderer(),
+       ]
+   )
+   ```
+
+3. Test locally by checking stdout output:
+   ```bash
+   python main.py 2>&1 | grep severity
+   ```
+
+### Issue 3: Missing Structured Fields
+
+**Symptoms:** Fields not queryable in Logs Explorer
+
+**Solution:** Verify JSON structure:
+```python
+# Test JSON output
+import structlog
+logger = structlog.get_logger()
+logger.info("test", field1="value1", field2="value2")
+# Should output: {"event": "test", "field1": "value1", "field2": "value2", ...}
+```
+
+### Issue 4: High Logging Costs
+
+**Symptoms:** Unexpected billing for Cloud Logging
+
+**Solutions:**
+1. Reduce DEBUG logs in production:
+   ```python
+   import logging
+   logging.getLogger().setLevel(logging.INFO)
+   ```
+
+2. Sample high-volume logs:
+   ```python
+   import random
+   if random.random() < 0.1:  # Log 10% of requests
+       logger.debug("Detailed info")
+   ```
+
+3. Use exclusion filters in GCP:
+   - Go to Logs Router
+   - Create exclusion filter for noisy logs
+
+---
+
+## Conclusion
+
+Implementing proper structured logging in GCP Cloud Run is essential for building observable, maintainable production systems. By following this guide, you've learned:
+
+- ✅ Why structured logging matters for production applications
+- ✅ How GCP Cloud Run automatically ingests logs from stdout
+- ✅ How to configure Python applications with structlog (without GCP SDK)
+- ✅ The magic of the `severity` field for proper log level mapping
+- ✅ How to deploy and validate logging in Cloud Run
+- ✅ Best practices for production-grade logging
+
+### Key Takeaways
+
+1. **No GCP SDK needed** - Just write JSON to stdout with a `severity` field
+2. **Always use JSON structured logging** for GCP Cloud Run
+3. **Include relevant context** in every log entry
+4. **Use appropriate severity levels** for filtering and alerting
+5. **The `severity` field is the key** - GCP automatically recognizes it
+6. **Sanitize sensitive data** before logging
+7. **Monitor log volume** to control costs
+
+### Next Steps
+
+- Implement correlation IDs for distributed tracing
+- Set up log-based alerts for critical errors
+- Configure log retention policies based on compliance needs
+- Explore Cloud Trace for deeper performance insights
+- Integrate with Error Reporting for exception tracking
+
+### Reference Implementation
+
+Complete working example: [https://github.com/vinaymavi/blog-fastapi-gcp-logging](https://github.com/vinaymavi/blog-fastapi-gcp-logging)
+
+---
+
+## Additional Resources
+
+- [GCP Cloud Logging Documentation](https://cloud.google.com/logging/docs)
+- [Cloud Run Logging Guide](https://cloud.google.com/run/docs/logging)
+- [Structlog Documentation](https://www.structlog.org/)
+- [FastAPI Documentation](https://fastapi.tiangolo.com/)
+- [Python Logging Best Practices](https://docs.python.org/3/howto/logging.html)
+
